@@ -106,5 +106,6 @@ def assign_codes_gpt(record: MedicalRecord):
 
 # Ensure app runs on the correct port (required for Render)
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8000))  # Default to 8000 if not set
+    port = int(os.getenv("PORT", 8000))  # Render assigns a dynamic port
+    print(f"🚀 Attempting to start FastAPI on port {port}")  # Debugging log
     uvicorn.run(app, host="0.0.0.0", port=port)
