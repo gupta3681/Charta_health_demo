@@ -5,10 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
 import openai
-
+import uvicorn
 
 # Load FastAPI app
 app = FastAPI()
+
 # Allow frontend to communicate with backend
 app.add_middleware(
     CORSMiddleware,
@@ -17,7 +18,6 @@ app.add_middleware(
     allow_methods=["*"], 
     allow_headers=["*"],  
 )
-
 
 # Load Zero-Shot Classification Model
 nlp_model = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
@@ -46,14 +46,13 @@ class MedicalRecord(BaseModel):
     notes: str  # Doctor's notes
 
 @app.post("/assign_codes")
-def assign_codes(record: MedicalRecord):
+def assign_codes_nlp(record: MedicalRecord):
     # Define possible diagnoses for the model
     possible_labels = list(ICD_10_CODES.keys())
 
     # Get AI-predicted diagnosis
     result = nlp_model(record.notes, candidate_labels=possible_labels)
     
-    print(result,"result")
 
     # Pick the highest-confidence label
     diagnosis = result["labels"][0]
@@ -69,8 +68,7 @@ def assign_codes(record: MedicalRecord):
         "hcc_code": hcc_code
     }
 
-
-# Function to call OpenAI GPT-4 API (Updated Version)
+# Function to call OpenAI GPT-4 API
 def get_diagnosis_from_llm(notes):
     prompt = f"""
     You are a medical assistant specializing in ICD-10 coding.
@@ -91,7 +89,7 @@ def get_diagnosis_from_llm(notes):
     return response.choices[0].message.content.strip().lower()
 
 @app.post("/assign_codes_gpt")
-def assign_codes(record: MedicalRecord):
+def assign_codes_gpt(record: MedicalRecord):
     # Get diagnosis from GPT-4
     diagnosis = get_diagnosis_from_llm(record.notes)
 
@@ -105,3 +103,8 @@ def assign_codes(record: MedicalRecord):
         "icd_10_code": icd_code,
         "hcc_code": hcc_code
     }
+
+# Ensure app runs on the correct port (required for Render)
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 8000))  # Default to 8000 if not set
+    uvicorn.run(app, host="0.0.0.0", port=port)
