@@ -37,7 +37,7 @@ function App() {
       });
 
       // Call Backend 2 (Port 8001)
-      const response2 = axios.post("http://127.0.0.1:8001/assign_codes", {
+      const response2 = axios.post("http://127.0.0.1:8000/assign_codes_gpt", {
         patient_name: patientName,
         age: parseInt(age),
         notes: notes,
