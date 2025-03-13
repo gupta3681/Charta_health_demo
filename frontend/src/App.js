@@ -22,6 +22,8 @@ function App() {
   const [errorBackend2, setErrorBackend2] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const BACKEND_URL = "https://chartahealthdemo-production.up.railway.app";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorBackend1(null);
@@ -30,14 +32,13 @@ function App() {
 
     try {
       // Call Backend 1 (Port 8000)
-      const response1 = axios.post("http://127.0.0.1:8000/assign_codes", {
+      const response1 = axios.post(`${BACKEND_URL}/assign_codes`, {
         patient_name: patientName,
         age: parseInt(age),
         notes: notes,
       });
 
-      // Call Backend 2 (Port 8001)
-      const response2 = axios.post("http://127.0.0.1:8000/assign_codes_gpt", {
+      const response2 = axios.post(`${BACKEND_URL}/assign_codes_gpt`, {
         patient_name: patientName,
         age: parseInt(age),
         notes: notes,
