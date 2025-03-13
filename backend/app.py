@@ -20,7 +20,7 @@ app.add_middleware(
 )
 
 # Load Zero-Shot Classification Model
-nlp_model = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+nlp_model = pipeline("zero-shot-classification", model="valhalla/distilbart-mnli-12-1")
 load_dotenv()
 
 # Read OpenAI API key from .env
