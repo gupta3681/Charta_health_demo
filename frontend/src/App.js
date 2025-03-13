@@ -31,33 +31,24 @@ function App() {
     setLoading(true);
 
     try {
-      // Call Backend 1 (Port 8000)
-      const response1 = axios.post(`${BACKEND_URL}/assign_codes`, {
+      // ✅ First API call (Zero-Shot Classification)
+      const response1 = await axios.post(`${BACKEND_URL}/assign_codes`, {
         patient_name: patientName,
         age: parseInt(age),
         notes: notes,
       });
 
-      const response2 = axios.post(`${BACKEND_URL}/assign_codes_gpt`, {
+      setResultBackend1(response1.data); // 🔥 Display result immediately!
+
+      // ✅ Second API call (GPT-4, runs AFTER first call finishes)
+      const response2 = await axios.post(`${BACKEND_URL}/assign_codes_gpt`, {
         patient_name: patientName,
         age: parseInt(age),
         notes: notes,
       });
 
-      // Wait for both requests to complete
-      const [backend1Data, backend2Data] = await Promise.all([
-        response1,
-        response2,
-      ]);
-
-      setResultBackend1(backend1Data.data);
-      setResultBackend2(backend2Data.data);
+      setResultBackend2(response2.data);
     } catch (error) {
-      if (error.config.url.includes("8000")) {
-        setErrorBackend1("Failed to connect to Backend 1 (Port 8000)");
-      } else if (error.config.url.includes("8001")) {
-        setErrorBackend2("Failed to connect to Backend 2 (Port 8001)");
-      }
       console.error("Error fetching codes", error);
     } finally {
       setLoading(false);
